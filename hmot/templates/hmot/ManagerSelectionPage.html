@@ -1,0 +1,61 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+    Manager Page
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <p>You will begin by choosing a verification service and project, then finally you will learn the true change in your asset value based on your project choice and choose which you want to report.</p>
+        </div>
+        <div class="row">
+            <div class="col-sm">
+                <div class="row">
+                    <h3>Verification Service Choice</h3>
+                    <p>You must select a verification service.</p>
+                    <p>Verification service costs 50.</p>
+                </div>
+                {% formfield player.audit_choice label="Please select a verification service" %}
+            </div>
+            <div class="col-sm">
+                <div class="col-sm">
+                    <div class="row">
+                        <h3>Project Choice</h3>
+                        <p>Your asset has a current value of 600.</p>
+                        <p>You must select a project. Your project choice will influence the change in your asset value</p>
+                        <!-- TODO: dynamic values based on market type -->
+                        <p>Project A costs 50 and has a 0.40 chance of changing your asset value by -400 and 0.60 chance of changing your asset value by 1000</p>
+                        <p>Project B costs 10 and will change your asset value by -400</p>
+                    </div>
+                    {% formfield player.project_choice label="Please select a verification service" %}
+                    <button type="button" class='btn btn-danger'>
+                        OK
+                    </button>
+                </div>
+            </div>
+            <div class="col-sm">
+                <div class="col-sm">
+                    <div class="row">
+                        <h3>Reported Asset Value Choice</h3>
+                        <p>Your asset has a starting value of 600.</p>
+                        <p>Based on your project choice, your asset value changed by 1000</p>
+
+                    </div>
+                    {% formfield player.project_choice label="Please select a verification service" %}
+                    <button class='btn btn-danger'>
+                        OK
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <h3>Your Prior Choices:</h3>
+        </div>
+        <div class="row">
+            <h3>Market history through previous period:</h3>
+        </div>
+    </div>
+
+{% endblock %}
