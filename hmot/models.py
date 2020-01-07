@@ -34,6 +34,16 @@ class Constants(BaseConstants):
         # [1, 'Service 1: 95%% accurate']
         audit_choices.append([audit_service, "Service %s: %s%% accurate" % (audit_service, accuracy)])
 
+    project_names = {
+        1: 'A',
+        2: 'B'
+    }
+
+    project_values = {
+        1: [[90, 1000], [10, 400]],
+        2: [[100, 100]]
+    }
+
 class Subsession(BaseSubsession):
     def creating_session(self):
         # randomize to treatments
@@ -47,12 +57,10 @@ class Subsession(BaseSubsession):
 class Group(BaseGroup):
     pass
 
-
 class Player(BasePlayer):
     role = models.StringField()
-    selected_project = models.StringField()
-    selected_auditor = models.StringField()
-
+    
+    # Manager specific
     audit_choice = models.IntegerField(
         choices=Constants.audit_choices,
         widget=widgets.RadioSelect
@@ -65,3 +73,21 @@ class Player(BasePlayer):
         ],
         widget = widgets.RadioSelect
     )
+
+    reported_value = models.IntegerField(
+        widget = widgets.RadioSelect
+    )
+
+    def reported_value_choices(self):
+        return [
+            [1, 1600],
+            [2, 200]
+        ]
+
+    def get_audit_choice(self):
+        return "Service %s: %s%% accurate" % (self.audit_choice, Constants.audit_services[self.audit_choice])
+
+    def get_project_choice(self):
+        return 'Project %s' % Constants.project_names[self.project_choice]
+
+    # Investor specific

@@ -6,7 +6,21 @@
 {% endblock %}
 
 {% block content %}
-
+    <div class="container">
+        <div class="row">
+            <div class="col-sm">
+                <p>Current Period {{ player.round_number }}</p>
+            </div>
+        </div>
+        <div class="row">
+            <p>As a Bidder you can now bid for each asset. The highest bidder will pay their bid and receive the true value of the asset.</p>
+            <p>This period, the asset's true value will be either 200 or 1600.</p>
+            <p>The asset's true value may be less than the reported value.</p>
+        </div>
+        <div class="row">
+            
+        </div>
+    </div>
     {% next_button %}
 
 {% endblock %}

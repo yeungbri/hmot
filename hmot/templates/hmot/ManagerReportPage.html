@@ -1,0 +1,25 @@
+{% extends "./ManagerBasePage.html" %}
+{% load otree static %}
+
+{% block audit_choice %}
+<p>You chose: {{player.get_audit_choice}}</p>
+{% endblock %}
+                
+
+{% block project_choice %}
+<p>Your project choice: {{player.get_project_choice}}</p>
+{% endblock %}
+
+{% block reported_value %}
+    <div class="col-sm">
+        <div class="row">
+            <h3>Reported Asset Value Choice</h3>
+            <p>Your asset has a starting value of 600.</p>
+            <p>Based on your project choice, your asset value changed by 1000</p>
+        </div>
+        {% formfield player.reported_value label="Please select the asset value you want to report to bidders" %}
+        <button class='btn btn-danger'>
+            OK
+        </button>
+    </div>
+{% endblock %}
