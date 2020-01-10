@@ -17,10 +17,56 @@
             <p>This period, the asset's true value will be either 200 or 1600.</p>
             <p>The asset's true value may be less than the reported value.</p>
         </div>
-        <div class="row">
-            
+        <div class="row overflow-auto">
+                <div class="col">
+                    <div class="row">
+                        <p>Reported Asset Value</p>
+                    </div>
+                    <div class="row">
+                        <p>Verification Report</p>
+                    </div>
+                    <div class="row">
+                        <p>Verification Service</p>
+                    </div>
+                    <!-- <div class="row">
+                        <p>How much do you want to bid?</p>
+                    </div> -->
+                </div>
+
+                {% for i in num_managers %}
+                    <div class="col">
+                        <div class="row">
+                            <p>{{i}}</p>
+                        </div>
+                        <div class="row">
+                            <p>Agree Report</p>
+                        </div>
+                        <div class="row">
+                            <p>Service 1: 95% accurate</p>
+                        </div>
+                        <input class="form-control bid" type=text placeholder="0">
+                    </div>
+                {% endfor %}
         </div>
     </div>
-    {% next_button %}
+
+    <button onclick="serializeBids()" class="btn btn-primary btn-large"> Next </button>
+
+    <input type="hidden" name="project_bids" />
+    <script>
+        function serializeBids() {
+            bidInputs = document.getElementsByClassName('bid');
+            result = ""
+            for (let i=0; i < bidInputs.length; i++) {
+                let bidValue = 0;
+                console.log(bidInputs[i].value)
+                if (bidInputs[i].value != "") {
+                    bidValue = bidInputs[i].value;
+                }
+                result += bidValue + ',';
+            }
+            document.getElementsByName("project_bids")[0].value = result;
+        }
+    </script>
 
 {% endblock %}

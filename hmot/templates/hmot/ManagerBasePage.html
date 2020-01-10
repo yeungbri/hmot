@@ -43,6 +43,30 @@
         </div>
         <div class="row">
             <h3>Your Prior Choices:</h3>
+            <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">Period</th>
+                    <th scope="col">Your Project Choice</th>
+                    <th scope="col">Your True Asset</th>
+                    <th scope="col">Your Reported Asset Value</th>
+                    <th scope="col">Verification Service</th>
+                    <th scope="col">Verification Report</th>
+                    <th scope="col">High Bid for Your Asset</th>
+                    <th scope="col">Earnings</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    {% for choice in previous_choices %}
+                    <tr>
+                        {% for value in choice %}
+                            <td>value</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+              </table>
+
         </div>
         <div class="row">
             <h3>Market history through previous period:</h3>

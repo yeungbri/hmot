@@ -10,18 +10,13 @@ from otree.api import (
 )
 import itertools
 
-author = 'Your name here'
-
-doc = """
-Your app description
-"""
-
-
 class Constants(BaseConstants):
     name_in_url = 'hmot'
     players_per_group = None
     num_rounds = 20
 
+    # Market Type
+    loss_possible = False
     audit_services = {
         1: 95,
         2: 80,
@@ -29,10 +24,10 @@ class Constants(BaseConstants):
         4: 50
     }
 
-    audit_choices = []
+    audit_choices = {}
     for audit_service, accuracy in audit_services.items():
         # [1, 'Service 1: 95%% accurate']
-        audit_choices.append([audit_service, "Service %s: %s%% accurate" % (audit_service, accuracy)])
+        audit_choices[audit_service] = "Service %s: %s%% accurate" % (audit_service, accuracy)
 
     project_names = {
         1: 'A',
@@ -40,29 +35,35 @@ class Constants(BaseConstants):
     }
 
     project_values = {
-        1: [[90, 1000], [10, 400]],
+        1: [[10, 1000], [90, 400]],
         2: [[100, 100]]
     }
 
+    initial_asset_value = 600
+
 class Subsession(BaseSubsession):
     def creating_session(self):
-        # randomize to treatments
         if self.round_number == 1:
             roles = itertools.cycle(['manager', 'investor'])
+            num_managers = 0
             for player in self.get_players():
+                # Assign roles
                 player.participant.vars['role'] = next(roles)
-                print("set participant['role'] to", player.participant.vars['role'])
-
-
+                if (player.participant.vars['role'] == 'manager'):
+                    num_managers += 1
+                
+                # Track manager's previous choices
+                player.participant.vars['manager_history'] = []
+            self.session.vars['num_managers'] = num_managers
+            self.session.vars['market_history'] = []
+           
 class Group(BaseGroup):
     pass
 
 class Player(BasePlayer):
-    role = models.StringField()
-    
     # Manager specific
     audit_choice = models.IntegerField(
-        choices=Constants.audit_choices,
+        choices= [ [k, Constants.audit_choices[k]] for k in Constants.audit_choices.keys()],
         widget=widgets.RadioSelect
     )
 
@@ -91,3 +92,4 @@ class Player(BasePlayer):
         return 'Project %s' % Constants.project_names[self.project_choice]
 
     # Investor specific
+    project_bids = models.StringField()

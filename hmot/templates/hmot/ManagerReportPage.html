@@ -14,8 +14,8 @@
     <div class="col-sm">
         <div class="row">
             <h3>Reported Asset Value Choice</h3>
-            <p>Your asset has a starting value of 600.</p>
-            <p>Based on your project choice, your asset value changed by 1000</p>
+            <p>Your asset has a starting value of {{initial_asset_value}}.</p>
+            <p>Based on your project choice, your asset value changed by {{asset_change}}</p>
         </div>
         {% formfield player.reported_value label="Please select the asset value you want to report to bidders" %}
         <button class='btn btn-danger'>
