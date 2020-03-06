@@ -74,7 +74,7 @@ class Group(BaseGroup):
                     project_bids[idx].append((investor_id, bid))
 
         for ph in [ph for ph in self.session.vars['project_history'] if ph.period == self.round_number]:
-            print(ph.manager_id)
+            # print(ph.manager_id)
             ph.set_bids(project_bids[ph.manager_id - 1])
 
 # Fields used for retrieving data from forms, comprehensive data stored in session.vars['project_history']

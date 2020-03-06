@@ -42,6 +42,12 @@ class ProjectHistory:
         self.high_bidder_earnings = self.true_asset_value - self.high_bid
         self.manager_earnings = self.high_bid - self.manager_cost
     
+    def get_verification_report(self):
+        return 'AGREE' if self.verification_report else 'DISAGREE'
+    
+    def get_verification_accurate(self):
+        return 'YES' if self.verification_accurate else 'NO'
+
     # format data for manager history display in template
     def gen_manager_history_row(self):
         return [
@@ -50,7 +56,7 @@ class ProjectHistory:
             self.true_asset_value,
             self.reported_asset_value,
             Constants.audit_choices[self.verification_service],
-            'AGREE' if self.verification_report else 'DISAGREE',
+            self.get_verification_report(),
             self.high_bid,
             self.manager_earnings
         ]
@@ -61,9 +67,9 @@ class ProjectHistory:
             self.period,
             self.true_asset_value,
             self.reported_asset_value,
-            self.verification_report,
-            self.verification_service,
-            self.verification_accurate,
+            self.get_verification_report(),
+            Constants.audit_choices[self.verification_service],
+            self.get_verification_accurate(),
             self.high_bid,
             self.high_bidder_earnings
         ]
@@ -71,7 +77,7 @@ class ProjectHistory:
 # Append market history method to base Page class
 def generate_market_history(self):
     result = []
-    for ph in self.session.vars['project_history']:
+    for ph in [ph for ph in self.session.vars['project_history'] if ph.period != self.round_number]:
         result.append(ph.gen_market_history_row)
     return result
 
@@ -86,8 +92,8 @@ class ManagerBasePage(Page):
 
     def vars_for_template(self):
         return dict(
-            previous_choices = self.generate_manager_history()
-            # market_history = self.generate_market_history()
+            previous_choices = self.generate_manager_history(),
+            market_history = self.generate_market_history()
         )
 
     # helper method to generate manager's history for template
@@ -208,7 +214,7 @@ class Results(Page):
     timeout_seconds = 60
     
     def before_next_page(self):
-        print(self.session.vars['project_history'])
+        # print(self.session.vars['project_history'])
 
 page_sequence = [
     ManagerSelectionPage, 
