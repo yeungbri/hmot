@@ -26,7 +26,7 @@ class ProjectHistory:
         self.verification_accurate = verification_accurate
     
     # Set after all investors have bid
-    def set_bid(self, bids):
+    def set_bids(self, bids):
         self.bids = bids # list of (investor, bid) tuples
         # calculate bid winner, high bid, manager earnings, high bidder earnings
         high_bidder = None
@@ -69,12 +69,13 @@ class ProjectHistory:
         ]
 
 # Append market history method to base Page class
-@add_method(Page)
 def generate_market_history(self):
     result = []
     for ph in self.session.vars['project_history']:
         result.append(ph.gen_market_history_row)
     return result
+
+setattr(Page, 'generate_market_history', generate_market_history)
 
 # Shared base class for both manager phases
 class ManagerBasePage(Page):
@@ -92,9 +93,9 @@ class ManagerBasePage(Page):
     # helper method to generate manager's history for template
     def generate_manager_history(self):
         result = []
-        for ph in self.session.vars['project_history']
+        for ph in [ph for ph in self.session.vars['project_history'] if ph.period < self.player.round_number]:
             if ph.manager_id == self.participant.id_in_session:
-                result.append(ph.generate_manager_history_row)
+                result.append(ph.gen_manager_history_row)
         return result
 
 # Phase where Manager selects a project and a verification service 
@@ -137,10 +138,11 @@ class ManagerReportPage(ManagerBasePage):
     form_fields = ['reported_value']
 
     def vars_for_template(self):
+        phs = [ph.asset_change for ph in self.session.vars['project_history'] 
+                if ph.manager_id == self.participant.id_in_session and ph.period == self.player.round_number - 1]
+        ac = phs[0] if phs else 0
         my_vars = dict(
-            # asset_change = self.participant.vars['manager_history'][self.player.round_number - 1].asset_change,
-            asset_change = [ph.asset_change for ph in self.session.vars['project_history'] 
-                if ph.manager_id == self.participant.id_in_session and ph.round == self.player.round_number - 1][0]
+            asset_change = ac,
             initial_asset_value = Constants.initial_asset_value
         )
         my_vars.update(super().vars_for_template())
@@ -161,8 +163,9 @@ class ManagerReportPage(ManagerBasePage):
 
     # Add audit outcome to project history
     def before_next_page(self):
-        ph = [ph for ph in self.session.vars['project_history'] 
-                if ph.manager_id == self.participant.id_in_session and ph.round == self.player.round_number][0]]
+        phs = [ph for ph in self.session.vars['project_history'] 
+                if ph.manager_id == self.participant.id_in_session and ph.period == self.player.round_number]
+        ph = phs[0] if phs else []
         ph.set_reported_asset_value(self.player.reported_value)
         verification_report, verification_accuracy = self.audit_reported_value(ph.true_asset_value)
         ph.set_verification_report(verification_report, verification_accuracy)
@@ -193,15 +196,19 @@ class InvestorResultsPage(WaitPage):
         return self.participant.vars['role'] == 'investor'
     
     # get bid winners of each project
-    after_all_players_arrive = 'get_bids'
+    after_all_players_arrive = 'set_project_bids'
+
+# Where managers wait while investors bid
+class ManagersWaitingPage(WaitPage):
+    def is_displayed(self):
+        return self.participant.vars['role'] == 'manager'
 
 # Display some results before next round
 class Results(Page):
     timeout_seconds = 60
     
     def before_next_page(self):
-        print('hello')
-        print(self.session.vars['winners'])
+        print(self.session.vars['project_history'])
 
 page_sequence = [
     ManagerSelectionPage, 

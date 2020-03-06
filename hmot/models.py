@@ -42,6 +42,7 @@ class Constants(BaseConstants):
     initial_asset_value = 600
 
 class Subsession(BaseSubsession):
+    # Initialize session wide variables and participant roles
     def creating_session(self):
         if self.round_number == 1:
             roles = itertools.cycle(['manager', 'investor'])
@@ -59,28 +60,24 @@ class Subsession(BaseSubsession):
             self.session.vars['project_history'] = []
 
 class Group(BaseGroup):
-    def get_bids(self):
-        bids = {}
+    # Append bid data (list of tuples container investor id and bid amount) to project history
+    def set_project_bids(self):
+        project_bids = {} # manager_id and list of bids
         for player in self.get_players():
-            print(player.participant.vars['role'])
             if (player.participant.vars['role'] == 'investor'):
-                bids[player.id_in_group] = player.project_bids.split(',')
-                # print(player.project_bids)
-        winners = {}
-        for i in range(1):
-            bid_winner = None
-            largest_bid = 0
-            for bidder, bids in bids.items():
-                bid = int(bids[i])
-                if bid > largest_bid:
-                    bid_winner = bidder
-                    largest_bid = bid
-            winners[i] = (bid_winner, largest_bid)
+                investor_id = player.participant.id_in_session
+                # TODO: use actual manager id instead of idx
+                for idx, bid in enumerate(player.project_bids.split(',')[:-1]):
+                    bid = int(bid)
+                    if idx not in project_bids.keys():
+                        project_bids[idx] = []
+                    project_bids[idx].append((investor_id, bid))
 
-        self.session.vars['winners'] = winners
-        print(winners)
-    pass
+        for ph in [ph for ph in self.session.vars['project_history'] if ph.period == self.round_number]:
+            print(ph.manager_id)
+            ph.set_bids(project_bids[ph.manager_id - 1])
 
+# Fields used for retrieving data from forms, comprehensive data stored in session.vars['project_history']
 class Player(BasePlayer):
     # Manager specific
     audit_choice = models.IntegerField(
