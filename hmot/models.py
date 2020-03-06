@@ -56,6 +56,7 @@ class Subsession(BaseSubsession):
                 player.participant.vars['manager_history'] = []
             self.session.vars['num_managers'] = num_managers
             self.session.vars['market_history'] = []
+            self.session.vars['project_history'] = []
 
 class Group(BaseGroup):
     def get_bids(self):
