@@ -56,8 +56,28 @@ class Subsession(BaseSubsession):
                 player.participant.vars['manager_history'] = []
             self.session.vars['num_managers'] = num_managers
             self.session.vars['market_history'] = []
-           
+
 class Group(BaseGroup):
+    def get_bids(self):
+        bids = {}
+        for player in self.get_players():
+            print(player.participant.vars['role'])
+            if (player.participant.vars['role'] == 'investor'):
+                bids[player.id_in_group] = player.project_bids.split(',')
+                # print(player.project_bids)
+        winners = {}
+        for i in range(1):
+            bid_winner = None
+            largest_bid = 0
+            for bidder, bids in bids.items():
+                bid = int(bids[i])
+                if bid > largest_bid:
+                    bid_winner = bidder
+                    largest_bid = bid
+            winners[i] = (bid_winner, largest_bid)
+
+        self.session.vars['winners'] = winners
+        print(winners)
     pass
 
 class Player(BasePlayer):

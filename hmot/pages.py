@@ -3,6 +3,7 @@ from ._builtin import Page, WaitPage
 from .models import Constants
 import random
 
+# Data structure for storing manager's choices
 class ManagerChoice:
     def __init__(self, period, verification_service, project_choice, asset_change):
         self.period = period
@@ -22,6 +23,7 @@ class ManagerChoice:
         # TODO: fix
         self.earnings = high_bid # - Constants.verification_service_cost - 
 
+# 
 class ManagerBasePage(Page):
     form_model = 'player'
 
@@ -34,10 +36,10 @@ class ManagerBasePage(Page):
             previous_choices = self.generate_previous_choices()
         )
 
+    # helper method to generate manager's history for template
     def generate_previous_choices(self):
         result = []
-        
-        for choice in self.participant.vars['manager_history'][:-1]:
+        for choice in self.participant.vars['manager_history']:
             single = [
                 choice.period,
                 Constants.project_names[choice.project_choice],
@@ -45,11 +47,10 @@ class ManagerBasePage(Page):
                 choice.reported_asset_value,
                 Constants.audit_choices[choice.verification_service],
                 'AGREE' if choice.verification_report else 'DISAGREE',
-                choice.high_bid,
-                choice.earnings
+                # choice.high_bid,
+                # choice.earnings
             ]
             result.append(single)
-        print(result)
         return result
 
 class ManagerSelectionPage(ManagerBasePage):
@@ -116,7 +117,19 @@ class ManagerReportPage(ManagerBasePage):
 class InvestorsWaitingPage(WaitPage):
     def is_displayed(self):
         return self.participant.vars['role'] == 'investor'
+        
+class InvestorResultsPage(WaitPage):
+    def is_displayed(self):
+        return self.participant.vars['role'] == 'investor'
+    
+    # get bid winners of each project
+    after_all_players_arrive = 'get_bids'
+        
+    def before_next_page(self):
+        print('hello')
+        print(self.session.vars['winners'])
 
+        
 class InvestorsBiddingPage(Page):
     # timeout_seconds = 60
     form_model = 'player'
@@ -135,14 +148,11 @@ class InvestorsBiddingPage(Page):
         bids_list = bids.split(',')
         
 
-    def before_next_page(self):
-        self.player.project_bids
-
-class ManagersWaitingPage(WaitPage):
-    def is_displayed(self):
-        return self.participant.vars['role'] == 'manager'
-
 class Results(Page):
     timeout_seconds = 60
+    
+    def before_next_page(self):
+        print('hello')
+        print(self.session.vars['winners'])
 
-page_sequence = [ManagerSelectionPage, ManagerReportPage, InvestorsWaitingPage, InvestorsBiddingPage, ManagersWaitingPage, Results]
+page_sequence = [ManagerSelectionPage, ManagerReportPage, InvestorsWaitingPage, InvestorsBiddingPage, InvestorResultsPage, ManagersWaitingPage, Results]
