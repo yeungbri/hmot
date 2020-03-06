@@ -214,6 +214,7 @@ class Results(Page):
     timeout_seconds = 60
     
     def before_next_page(self):
+        pass
         # print(self.session.vars['project_history'])
 
 page_sequence = [
