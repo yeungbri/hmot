@@ -1,2 +1,1 @@
-python_version >= 3.7
 otree>=2.1.28
