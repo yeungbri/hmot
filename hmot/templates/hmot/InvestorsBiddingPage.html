@@ -28,17 +28,10 @@
                     <div class="row">
                         <p>Verification Service</p>
                     </div>
-                    <!-- <div class="row">
-                        <p>How much do you want to bid?</p>
-                    </div> -->
                 </div>
 
                 {% for project_info in current_projects %}
                     <div class="col">
-                        <!-- project index (1-indexed) -->
-                        <div class="row">
-                            <p>{{ forloop.counter }}</p>
-                        </div>
                         <!-- verification report and verification service -->
                         {% for info in project_info %}
                             <div class="row">

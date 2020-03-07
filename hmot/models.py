@@ -10,6 +10,19 @@ from otree.api import (
 )
 import itertools
 
+class Project:
+    def __init__(self, name, cost, probability):
+        self.name = name
+        self.cost = cost
+        # list of [probability (%), value] for each project
+        self.probability = probability
+    
+    def get_choice_str(self):
+        return f'Project {self.name}: {self.cost}'
+
+    def get_project_name(self):
+        return f'Project {self.name}'
+
 class Constants(BaseConstants):
     name_in_url = 'hmot'
     players_per_group = None
@@ -17,6 +30,9 @@ class Constants(BaseConstants):
 
     # Market Type
     loss_possible = False
+
+    # Manager's initial asset value
+    initial_asset_value = 600
 
     # Service id and accuracy (probability of finding true asset value)
     audit_services = {
@@ -31,19 +47,16 @@ class Constants(BaseConstants):
         # [1, 'Service 1: 95%% accurate']
         audit_choices[audit_service] = "Service %s: %s%% accurate" % (audit_service, accuracy)
     
-    # list of [probability (%), value] for each project
-    project_values = {
-        1: [[10, 1000], [90, 400]],
-        2: [[100, 100]]
-    }
-    # display names for projects
-    project_names = {
-        1: 'A',
-        2: 'B'
+    projects = {
+        1: Project('A', 50, [[10, 1000], [90, 400]]),
+        2: Project('B', 100, [[100, 100]])
     }
 
-    # Manager's initial asset value
-    initial_asset_value = 600
+    # Manager report values
+    report_values = {
+        1: 1600,
+        2: 200
+    }
 
 class Subsession(BaseSubsession):
     # Initialize session wide variables and participant roles
@@ -53,10 +66,10 @@ class Subsession(BaseSubsession):
             num_managers = 0
             project_idx_to_manager_id = {}
             for player in self.get_players():
-                print(player.participant.id_in_session)
                 # Assign roles
                 player.participant.vars['role'] = next(roles)
-                print(player.participant.vars['role'])
+                # print(player.participant.id_in_session)
+                # print(player.participant.vars['role'])
                 if (player.participant.vars['role'] == 'manager'):
                     project_idx_to_manager_id[num_managers] = player.participant.id_in_session
                     num_managers += 1
@@ -81,8 +94,8 @@ class Group(BaseGroup):
                         project_bids[manager_id] = []
                     project_bids[manager_id].append((investor_id, bid))
 
+        # manager_id is used to identify each project for current round
         for ph in [ph for ph in self.session.vars['project_history'] if ph.period == self.round_number]:
-            # print(ph.manager_id)
             ph.set_bids(project_bids[ph.manager_id])
 
 # Fields used for retrieving data from forms, comprehensive data stored in session.vars['project_history']
@@ -91,15 +104,12 @@ class Player(BasePlayer):
 
     # Id of audit service choosen by a manager
     audit_choice = models.IntegerField(
-        choices = [ [k, Constants.audit_choices[k]] for k in Constants.audit_choices.keys()],
+        choices = [[k, Constants.audit_choices[k]] for k in Constants.audit_choices.keys()],
         widget = widgets.RadioSelect
     )
     # Id of project choosen by a manager
     project_choice = models.IntegerField(
-        choices = [
-            [1, 'Project A: 50'],
-            [2, 'Project B: 10']
-        ],
+        choices = [[k, Constants.projects[k].get_choice_str()] for k in Constants.projects.keys()],
         widget = widgets.RadioSelect
     )
     # Reported asset value choosen by manager
@@ -110,10 +120,7 @@ class Player(BasePlayer):
     # TODO: move this to constants
     # oTree method for providing choices to reported value
     def reported_value_choices(self):
-        return [
-            [1, 1600],
-            [2, 200]
-        ]
+        return [[k, Constants.report_values[k]] for k in Constants.report_values.keys()]
 
     # Display value of audit choice
     def get_audit_choice(self):
@@ -121,7 +128,7 @@ class Player(BasePlayer):
 
     # Display value of project choice
     def get_project_choice(self):
-        return 'Project %s' % Constants.project_names[self.project_choice]
+        return Constants.projects[self.project_choice].get_project_name()
 
     # Investor specific fields (not used by manager players)
 

@@ -55,10 +55,14 @@ class ProjectHistory:
     
     def get_verification_service(self):
         return Constants.audit_choices[self.verification_service]
+    
+    def get_reported_asset_value(self):
+        return Constants.report_values[self.reported_asset_value]
 
-    # format data for bidding tempalte
+    # format data for investor bidding tempalte
     def gen_bidding_column(self):
         return [
+            self.get_reported_asset_value(),
             self.print_verification_report(),
             self.get_verification_service()
         ]
@@ -67,9 +71,9 @@ class ProjectHistory:
     def gen_manager_history_row(self):
         return [
             self.period,
-            Constants.project_names[self.project_choice],
+            Constants.projects[self.project_choice].name,
             self.true_asset_value,
-            self.reported_asset_value,
+            self.get_reported_asset_value(),
             self.get_verification_service(),
             self.get_verification_report(),
             self.high_bid,
@@ -81,7 +85,7 @@ class ProjectHistory:
         return [
             self.period,
             self.true_asset_value,
-            self.reported_asset_value,
+            self.get_reported_asset_value(),
             self.get_verification_report(),
             self.get_verification_service(),
             self.get_verification_accurate(),
@@ -132,7 +136,7 @@ class ManagerSelectionPage(ManagerBasePage):
 
     # Determines success/failure of project and associated change in asset value
     def calculate_project_result(self):
-        probability_distribution = Constants.project_values[self.player.project_choice]
+        probability_distribution = Constants.projects[self.player.project_choice].probability
         # assumes maximum of two probabilities in distribution
         choice1_prob = probability_distribution[0][0]/100.0
         asset_change = None
