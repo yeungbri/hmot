@@ -42,6 +42,7 @@
                     </div>
                 {% endfor %}
         </div>
+        {% if market_history %}
         <div class="row">
             <h3>Market history through previous period:</h3>
             <table class="table">
@@ -68,6 +69,7 @@
                 </tbody>
             </table>
         </div>
+        {% endif %}
     </div>
 
     <button onclick="serializeBids()" class="btn btn-primary btn-large"> Next </button>

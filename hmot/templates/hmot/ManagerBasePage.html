@@ -41,6 +41,7 @@
                 {% block reported_value %}{% endblock %}
             </div>
         </div>
+        {% if previous_choices %}
         <div class="row">
             <h3>Your Prior Choices:</h3>
             <table class="table">
@@ -67,6 +68,8 @@
                 </tbody>
             </table>
         </div>
+        {% endif %}
+        {% if market_history %}
         <div class="row">
             <h3>Market history through previous period:</h3>
             <table class="table">
@@ -93,6 +96,7 @@
                 </tbody>
             </table>
         </div>
+        {% endif %}
     </div>
 
 {% endblock %}

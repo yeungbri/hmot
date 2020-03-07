@@ -13,8 +13,8 @@ SESSION_CONFIGS = [
     dict(
         name='hmot',
         app_sequence=['hmot'],
-        num_demo_participants=2,
-        role='manager'
+        num_demo_participants=4,
+        # role='manager'
     ),
     # dict(
     #    name='public_goods',
