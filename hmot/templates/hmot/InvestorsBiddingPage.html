@@ -33,17 +33,18 @@
                     </div> -->
                 </div>
 
-                {% for i in num_managers %}
+                {% for project_info in current_projects %}
                     <div class="col">
+                        <!-- project index (1-indexed) -->
                         <div class="row">
-                            <p>{{i}}</p>
+                            <p>{{ forloop.counter }}</p>
                         </div>
-                        <div class="row">
-                            <p>Agree Report</p>
-                        </div>
-                        <div class="row">
-                            <p>Service 1: 95% accurate</p>
-                        </div>
+                        <!-- verification report and verification service -->
+                        {% for info in project_info %}
+                            <div class="row">
+                                <p>{{ info }}</p>
+                            </div>
+                        {% endfor %}
                         <input class="form-control bid" type=text placeholder="0">
                     </div>
                 {% endfor %}
@@ -83,13 +84,19 @@
         function serializeBids() {
             bidInputs = document.getElementsByClassName('bid');
             result = ""
+            
             for (let i=0; i < bidInputs.length; i++) {
                 let bidValue = 0;
-                console.log(bidInputs[i].value)
+                // console.log(bidInputs[i].value)
                 if (bidInputs[i].value != "") {
                     bidValue = bidInputs[i].value;
                 }
                 result += bidValue + ',';
+            }
+
+            // remove trailing commas
+            while (result.charAt( result.length-1 ) == ",") {
+                result = result.slice(0, -1)
             }
             document.getElementsByName("project_bids")[0].value = result;
         }

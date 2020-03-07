@@ -42,11 +42,26 @@ class ProjectHistory:
         self.high_bidder_earnings = self.true_asset_value - self.high_bid
         self.manager_earnings = self.high_bid - self.manager_cost
     
+    # For market/manager history template
     def get_verification_report(self):
         return 'AGREE' if self.verification_report else 'DISAGREE'
     
+    # For bidding phase template
+    def print_verification_report(self):
+        return "Agree Report" if self.verification_report else "Disagree Report" 
+    
     def get_verification_accurate(self):
         return 'YES' if self.verification_accurate else 'NO'
+    
+    def get_verification_service(self):
+        return Constants.audit_choices[self.verification_service]
+
+    # format data for bidding tempalte
+    def gen_bidding_column(self):
+        return [
+            self.print_verification_report(),
+            self.get_verification_service()
+        ]
 
     # format data for manager history display in template
     def gen_manager_history_row(self):
@@ -55,7 +70,7 @@ class ProjectHistory:
             Constants.project_names[self.project_choice],
             self.true_asset_value,
             self.reported_asset_value,
-            Constants.audit_choices[self.verification_service],
+            self.get_verification_service(),
             self.get_verification_report(),
             self.high_bid,
             self.manager_earnings
@@ -68,7 +83,7 @@ class ProjectHistory:
             self.true_asset_value,
             self.reported_asset_value,
             self.get_verification_report(),
-            Constants.audit_choices[self.verification_service],
+            self.get_verification_service(),
             self.get_verification_accurate(),
             self.high_bid,
             self.high_bidder_earnings
@@ -146,7 +161,7 @@ class ManagerReportPage(ManagerBasePage):
 
     def vars_for_template(self):
         phs = [ph.asset_change for ph in self.session.vars['project_history'] 
-                if ph.manager_id == self.participant.id_in_session and ph.period == self.player.round_number - 1]
+                if ph.manager_id == self.participant.id_in_session and ph.period == self.round_number - 1]
         ac = phs[0] if phs else 0
         my_vars = dict(
             asset_change = ac,
@@ -171,7 +186,7 @@ class ManagerReportPage(ManagerBasePage):
     # Add audit outcome to project history
     def before_next_page(self):
         phs = [ph for ph in self.session.vars['project_history'] 
-                if ph.manager_id == self.participant.id_in_session and ph.period == self.player.round_number]
+                if ph.manager_id == self.participant.id_in_session and ph.period == self.round_number]
         ph = phs[0] if phs else []
         ph.set_reported_asset_value(self.player.reported_value)
         verification_report, verification_accuracy = self.audit_reported_value(ph.true_asset_value)
@@ -191,9 +206,17 @@ class InvestorsBiddingPage(Page):
     def is_displayed(self):
         return self.participant.vars['role'] == 'investor'
 
+    # create list of necessary info for bidding columns
+    def generate_project_details(self):
+        result = []
+        for ph in self.session.vars['project_history']:
+            if ph.period == self.round_number:
+                result.append(ph.gen_bidding_column())
+        return result
+
     def vars_for_template(self):
         return dict(
-            num_managers = range(self.session.vars['num_managers']),
+            current_projects = self.generate_project_details(),
             market_history = self.generate_market_history()
         )
 

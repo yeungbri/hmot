@@ -51,32 +51,39 @@ class Subsession(BaseSubsession):
         if self.round_number == 1:
             roles = itertools.cycle(['manager', 'investor'])
             num_managers = 0
+            project_idx_to_manager_id = {}
             for player in self.get_players():
+                print(player.participant.id_in_session)
                 # Assign roles
                 player.participant.vars['role'] = next(roles)
+                print(player.participant.vars['role'])
                 if (player.participant.vars['role'] == 'manager'):
+                    project_idx_to_manager_id[num_managers] = player.participant.id_in_session
                     num_managers += 1
-                
+
+            self.session.vars['project_idx_to_manager_id'] = project_idx_to_manager_id
+            # stores total number of managers so correct number of projects can be bid on for investor template
             self.session.vars['num_managers'] = num_managers
+            # list of ProjectHistory objects, used for displaying manager history and market history
             self.session.vars['project_history'] = []
 
 class Group(BaseGroup):
     # Append bid data (list of tuples container investor id and bid amount) to project history
     def set_project_bids(self):
-        project_bids = {} # manager_id and list of bids
+        project_bids = {} # manager_id to list of bids
         for player in self.get_players():
             if (player.participant.vars['role'] == 'investor'):
                 investor_id = player.participant.id_in_session
-                # TODO: use actual manager id instead of idx
-                for idx, bid in enumerate(player.project_bids.split(',')[:-1]):
+                for idx, bid in enumerate(player.project_bids.split(',')):
                     bid = int(bid)
-                    if idx not in project_bids.keys():
-                        project_bids[idx] = []
-                    project_bids[idx].append((investor_id, bid))
+                    manager_id = self.session.vars['project_idx_to_manager_id'][idx]
+                    if manager_id not in project_bids.keys():
+                        project_bids[manager_id] = []
+                    project_bids[manager_id].append((investor_id, bid))
 
         for ph in [ph for ph in self.session.vars['project_history'] if ph.period == self.round_number]:
             # print(ph.manager_id)
-            ph.set_bids(project_bids[ph.manager_id - 1])
+            ph.set_bids(project_bids[ph.manager_id])
 
 # Fields used for retrieving data from forms, comprehensive data stored in session.vars['project_history']
 class Player(BasePlayer):
