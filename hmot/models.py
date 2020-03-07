@@ -24,10 +24,14 @@ class Project:
         return f'Project {self.name}'
     
     def get_explanation(self):
-        result = f'Project A costs {cost}'
-        for key, prob in probability.items():
-
-        ' and has a 0.40 chance of changing your asset value by -400 and 0.60 chance of changing your asset value by 1000'
+        result = f'Project {self.name} costs {self.cost} and has a '
+        for idx, outcome in enumerate(self.probability):
+            prob, change = outcome
+            prob = '%.2f'%(prob/100)
+            result += f'{prob} chance of changing your asset value by {change}'
+            if idx != len(self.probability) - 1:
+                result += ' and a '
+        return result
 
 class Constants(BaseConstants):
     name_in_url = 'hmot'
