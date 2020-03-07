@@ -194,7 +194,7 @@ class InvestorsBiddingPage(Page):
     def vars_for_template(self):
         return dict(
             num_managers = range(self.session.vars['num_managers']),
-            # market_history = self.generate_market_history()
+            market_history = self.generate_market_history()
         )
 
 # Aggregate bids (not visible)

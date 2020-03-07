@@ -48,6 +48,32 @@
                     </div>
                 {% endfor %}
         </div>
+        <div class="row">
+            <h3>Market history through previous period:</h3>
+            <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">Period</th>
+                    <th scope="col">True Value</th>
+                    <th scope="col">Reported Value</th>
+                    <th scope="col">Verification Report</th>
+                    <th scope="col">Verification Service</th>
+                    <th scope="col">Verification Accuracy</th>
+                    <th scope="col">High Bid</th>
+                    <th scope="col">High Bidder Earned</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    {% for history in market_history %}
+                    <tr>
+                        {% for value in history %}
+                            <td>{{ value }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <button onclick="serializeBids()" class="btn btn-primary btn-large"> Next </button>
