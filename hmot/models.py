@@ -22,6 +22,16 @@ class Project:
 
     def get_project_name(self):
         return f'Project {self.name}'
+    
+    def get_explanation(self):
+        result = f'Project {self.name} costs {self.cost} and has a '
+        for idx, outcome in enumerate(self.probability):
+            prob, change = outcome
+            prob = '%.2f'%(prob/100)
+            result += f'{prob} chance of changing your asset value by {change}'
+            if idx != len(self.probability) - 1:
+                result += ' and a '
+        return result
 
 class Constants(BaseConstants):
     name_in_url = 'hmot'
@@ -29,7 +39,7 @@ class Constants(BaseConstants):
     num_rounds = 20
 
     # Market Type
-    loss_possible = False
+    loss_possible = True
 
     # Manager's initial asset value
     initial_asset_value = 600
@@ -47,16 +57,28 @@ class Constants(BaseConstants):
         # [1, 'Service 1: 95%% accurate']
         audit_choices[audit_service] = "Service %s: %s%% accurate" % (audit_service, accuracy)
     
-    projects = {
-        1: Project('A', 50, [[10, 1000], [90, 400]]),
-        2: Project('B', 100, [[100, 100]])
-    }
+    projects = None
+    if loss_possible:
+        projects = {
+            1: Project('A', 50, [[10, 1000], [90, -400]]),
+            2: Project('B', 100, [[100, -400]])
+        }
+    else:
+        projects = {
+            1: Project('A', 50, [[10, 1000], [90, 400]]),
+            2: Project('B', 100, [[100, 100]])
+        }
+
+    def generate_report_values(projects, initial_asset_value):
+        vals = set() # all unique possible values
+        for key, project in projects.items():
+            for outcome in project.probability:
+                prob, change = outcome
+                vals.add(initial_asset_value + change)
+        return dict(enumerate(vals))
 
     # Manager report values
-    report_values = {
-        1: 1600,
-        2: 200
-    }
+    report_values = generate_report_values(projects, initial_asset_value)
 
 class Subsession(BaseSubsession):
     # Initialize session wide variables and participant roles

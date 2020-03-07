@@ -113,7 +113,9 @@ class ManagerBasePage(Page):
     def vars_for_template(self):
         return dict(
             previous_choices = self.generate_manager_history(),
-            market_history = self.generate_market_history()
+            market_history = self.generate_market_history(),
+            initial_asset_value = Constants.initial_asset_value,
+            project_explanations = [p.get_explanation() for k, p in Constants.projects.items()]
         )
 
     # helper method to generate manager's history for template
@@ -238,12 +240,15 @@ class ManagersWaitingPage(WaitPage):
         return self.participant.vars['role'] == 'manager'
 
 # Display some results before next round
-class Results(Page):
-    timeout_seconds = 60
+# class Results(Page):
+#     timeout_seconds = 60
+
+#     def is_displayed(self):
+#         return self.participant.vars['role'] == 'investor'
     
-    def before_next_page(self):
-        # print(self.session.vars['project_history'])
-        pass
+#     def before_next_page(self):
+#         # print(self.session.vars['project_history'])
+#         pass
 
 page_sequence = [
     ManagerSelectionPage, 
@@ -251,6 +256,5 @@ page_sequence = [
     InvestorsWaitingPage, 
     InvestorsBiddingPage, 
     InvestorResultsPage, 
-    ManagersWaitingPage, 
-    Results
+    ManagersWaitingPage
 ]

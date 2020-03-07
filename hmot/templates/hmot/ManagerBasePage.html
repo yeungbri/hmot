@@ -28,11 +28,11 @@
                 <div class="col-sm">
                     <div class="row">
                         <h3>Project Choice</h3>
-                        <p>Your asset has a current value of 600.</p>
+                        <p>Your asset has a current value of {{ initial_asset_value }}.</p>
                         <p>You must select a project. Your project choice will influence the change in your asset value</p>
-                        <!-- TODO: dynamic values based on market type -->
-                        <p>Project A costs 50 and has a 0.40 chance of changing your asset value by -400 and 0.60 chance of changing your asset value by 1000</p>
-                        <p>Project B costs 10 and will change your asset value by -400</p>
+                        {% for e in project_explanations %}
+                            <p>{{ e }}</p>
+                        {% endfor %}
                     </div>
                     {% block project_choice %}{% endblock %}
                 </div>
