@@ -74,13 +74,14 @@ class ProjectHistory:
             self.high_bidder_earnings
         ]
 
-# Append market history method to base Page class
+# helper method to generate market history for template
 def generate_market_history(self):
     result = []
     for ph in [ph for ph in self.session.vars['project_history'] if ph.period != self.round_number]:
         result.append(ph.gen_market_history_row)
     return result
 
+# Append market history method to base Page class
 setattr(Page, 'generate_market_history', generate_market_history)
 
 # Shared base class for both manager phases
@@ -214,8 +215,8 @@ class Results(Page):
     timeout_seconds = 60
     
     def before_next_page(self):
-        pass
         # print(self.session.vars['project_history'])
+        pass
 
 page_sequence = [
     ManagerSelectionPage, 
